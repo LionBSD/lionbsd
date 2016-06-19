@@ -50,15 +50,13 @@ static const struct crypt_format {
 	char *(*const func)(const char *, const char *);
 	const char *const magic;
 } crypt_formats[] = {
-	{ "md5",	crypt_md5,		"$1$"	},
 #ifdef HAS_BLOWFISH
 	{ "blf",	crypt_blowfish,		"$2"	},
 #endif
-	{ "nth",	crypt_nthash,		"$3$"	},
 	{ "sha256",	crypt_sha256,		"$5$"	},
 	{ "sha512",	crypt_sha512,		"$6$"	},
-#ifdef HAS_DES
-	{ "des",	crypt_des,		"_"	},
+#ifdef HAS_ARGON2
+	{ "argon2i",	crypt_argon2i,		"$argon2i$"	},
 #endif
 
 	/* sentinel */
@@ -67,9 +65,6 @@ static const struct crypt_format {
 
 static const struct crypt_format *crypt_format =
     &crypt_formats[(sizeof crypt_formats / sizeof *crypt_formats) - 2];
-
-#define DES_SALT_ALPHABET \
-	"./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
 /*
  * Returns the name of the currently selected format.
@@ -107,17 +102,13 @@ char *
 crypt(const char *passwd, const char *salt)
 {
 	const struct crypt_format *cf;
-#ifdef HAS_DES
-	int len;
-#endif
 
 	for (cf = crypt_formats; cf->name != NULL; ++cf)
 		if (cf->magic != NULL && strstr(salt, cf->magic) == salt)
 			return (cf->func(passwd, salt));
-#ifdef HAS_DES
-	len = strlen(salt);
-	if ((len == 13 || len == 2) && strspn(salt, DES_SALT_ALPHABET) == len)
-		return (crypt_des(passwd, salt));
+
+#ifdef HAS_ARGON2
+	return (crypt_argon2i(passwd, salt));
 #endif
 	return (crypt_format->func(passwd, salt));
 }

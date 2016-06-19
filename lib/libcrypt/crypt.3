@@ -29,7 +29,7 @@
 .\"
 .\" $FreeBSD$
 .\"
-.Dd March 9, 2014
+.Dd June 17, 2016
 .Dt CRYPT 3
 .Os
 .Sh NAME
@@ -200,6 +200,8 @@ NT-Hash
 SHA-256
 .It
 SHA-512
+.It
+Argon2i
 .El
 .Pp
 Other crypt formats may be easily added.
@@ -285,6 +287,7 @@ libcrypt encryption library.
 Originally written by
 .An David Burren Aq Mt davidb@werj.com.au ,
 later additions and changes by
+.An Yonas Yanfa ,
 .An Poul-Henning Kamp ,
 .An Mark R V Murray ,
 .An Michael Bretterklieber ,
